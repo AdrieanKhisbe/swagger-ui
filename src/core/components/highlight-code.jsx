@@ -3,6 +3,16 @@ import PropTypes from "prop-types"
 import { highlight } from "core/utils"
 import saveAs from "js-file-download"
 
+import Lowlight from "react-lowlight"
+
+import js from "highlight.js/lib/languages/javascript"
+import json from "highlight.js/lib/languages/json"
+import xml from "highlight.js/lib/languages/xml"
+
+Lowlight.registerLanguage("json", json)
+Lowlight.registerLanguage("js", js)
+Lowlight.registerLanguage("xml", xml)
+
 export default class HighlightCode extends Component {
   static propTypes = {
     value: PropTypes.string.isRequired,
@@ -11,17 +21,17 @@ export default class HighlightCode extends Component {
     fileName: PropTypes.string
   }
 
-  componentDidMount() {
-    highlight(this.el)
-  }
+  // componentDidMount() {
+  //   highlight(this.el)
+  // }
 
-  componentDidUpdate() {
-    highlight(this.el)
-  }
+  // componentDidUpdate() {
+  //   highlight(this.el)
+  // }
 
-  initializeComponent = (c) => {
-    this.el = c
-  }
+  // initializeComponent = (c) => {
+  //   this.el = c
+  // }
 
   downloadText = () => {
     saveAs(this.props.value, this.props.fileName || "response.txt")
@@ -46,23 +56,24 @@ export default class HighlightCode extends Component {
     }
   }
 
-  render () {
+  render() {
     let { value, className, downloadable } = this.props
     className = className || ""
 
     return (
-      <div className="highlight-code">
-        { !downloadable ? null :
+      <div className={"highlighted-code " + className}>
+        {!downloadable ? null :
           <div className="download-contents" onClick={this.downloadText}>
             Download
           </div>
         }
-        <pre
-          ref={this.initializeComponent}
+
+        <Lowlight
+          value={value}
           onWheel={this.preventYScrollingBeyondElement}
-          className={className + " microlight"}>
-          {value}
-        </pre>
+        />
+
+
       </div>
     )
   }
