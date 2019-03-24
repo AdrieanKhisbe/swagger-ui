@@ -182,6 +182,29 @@ export function mapToList(map, keyNames="key", collectedKeys=Im.Map()) {
   return list
 }
 
+export const copyToClipboard = str => {
+  // adapted from https://hackernoon.com/copying-text-to-clipboard-with-javascript-df4d4988697f
+  const el = document.createElement("textarea")
+  el.value = str
+  el.setAttribute("readonly", "")
+  el.style.position = "absolute"
+  el.style.left = "-9999px"
+
+  document.body.appendChild(el)
+  // preserve selection
+  const selected =
+    document.getSelection().rangeCount > 0
+    ? document.getSelection().getRangeAt(0)
+    : false
+  el.select()
+  document.execCommand("copy")
+  document.body.removeChild(el)
+  if (selected) {
+    document.getSelection().removeAllRanges()
+    document.getSelection().addRange(selected)
+  }
+}
+
 export function extractFileNameFromContentDispositionHeader(value){
   let patterns = [
     /filename\*=[^']+'\w*'"([^"]+)";?/i,
@@ -189,13 +212,13 @@ export function extractFileNameFromContentDispositionHeader(value){
     /filename="([^;]*);?"/i,
     /filename=([^;]*);?/i
   ]
-  
+
   let responseFilename
   patterns.some(regex => {
     responseFilename = regex.exec(value)
     return responseFilename !== null
   })
-    
+
   if (responseFilename !== null && responseFilename.length > 1) {
     try {
       return decodeURIComponent(responseFilename[1])
@@ -650,7 +673,7 @@ export function paramToIdentifier(param, { returnAll = false, allowHashes = true
   }
   const paramName = param.get("name")
   const paramIn = param.get("in")
-  
+
   let generatedIdentifiers = []
 
   // Generate identifiers in order of most to least specificity
@@ -658,7 +681,7 @@ export function paramToIdentifier(param, { returnAll = false, allowHashes = true
   if (param && param.hashCode && paramIn && paramName && allowHashes) {
     generatedIdentifiers.push(`${paramIn}.${paramName}.hash-${param.hashCode()}`)
   }
-  
+
   if(paramIn && paramName) {
     generatedIdentifiers.push(`${paramIn}.${paramName}`)
   }
